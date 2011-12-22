@@ -364,12 +364,15 @@ int CmdTargets(State* state, int argc, char* argv[]) {
 int CmdRules(State* state, int argc, char* /* argv */[]) {
   for (map<string, const Rule*>::iterator i = state->rules_.begin();
        i != state->rules_.end(); ++i) {
-    if (i->second->description_.unparsed_.empty()) {
+    if (i->second->description_.empty()) {
       printf("%s\n", i->first.c_str());
     } else {
       printf("%s: %s\n",
              i->first.c_str(),
-             i->second->description_.unparsed_.c_str());
+             // XXX I changed it such that we don't have an easy way
+             // to get the source text anymore, so this output is
+             // unsatisfactory.  How useful is this command, anyway?
+             i->second->description_.Serialize().c_str());
     }
   }
   return 0;

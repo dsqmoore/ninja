@@ -28,8 +28,6 @@ void BindingEnv::AddBinding(const string& key, const string& val) {
 }
 
 bool EvalString::Parse(const string& input, string* err, size_t* err_index) {
-  unparsed_ = input;
-
   string::size_type start, end;
   start = 0;
   do {
@@ -92,6 +90,28 @@ string EvalString::Evaluate(Env* env) const {
       result.append(i->first);
     else
       result.append(env->LookupVariable(i->first));
+  }
+  return result;
+}
+
+void EvalString::Add(TokenType type, StringPiece text) {
+  // Add it to the end of an existing RAW token if possible.
+  if (type == RAW && !parsed_.empty() && parsed_.back().second == RAW) {
+    parsed_.back().first.append(text.str_, text.len_);
+  } else {
+    parsed_.push_back(make_pair(text.AsString(), type));
+  }
+}
+
+string EvalString::Serialize() const {
+  string result;
+  for (TokenList::const_iterator i = parsed_.begin();
+       i != parsed_.end(); ++i) {
+    result.append("[");
+    if (i->second == SPECIAL)
+      result.append("$");
+    result.append(i->first);
+    result.append("]");
   }
   return result;
 }

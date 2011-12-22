@@ -41,7 +41,6 @@ TEST(EvalString, OneVariable) {
   string err;
   EXPECT_TRUE(str.Parse("hi $var", &err));
   EXPECT_EQ("", err);
-  EXPECT_EQ("hi $var", str.unparsed());
   TestEnv env;
   EXPECT_EQ("hi ", str.Evaluate(&env));
   env.vars["var"] = "there";
@@ -53,7 +52,6 @@ TEST(EvalString, OneVariableUpperCase) {
   string err;
   EXPECT_TRUE(str.Parse("hi $VaR", &err));
   EXPECT_EQ("", err);
-  EXPECT_EQ("hi $VaR", str.unparsed());
   TestEnv env;
   EXPECT_EQ("hi ", str.Evaluate(&env));
   env.vars["VaR"] = "there";
