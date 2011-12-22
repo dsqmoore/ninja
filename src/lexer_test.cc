@@ -70,7 +70,7 @@ TEST(Lexer, Error) {
   EvalString eval;
   string err;
   ASSERT_FALSE(lexer.ReadVarValue(&eval, &err));
-  EXPECT_EQ("input:2: lexing error\n"
+  EXPECT_EQ("input:2: bad $-escape (literal $ must be written as $$)\n"
             "bad $\n"
             "    ^\n"
             , err);

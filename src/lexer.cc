@@ -534,18 +534,18 @@ bool Lexer::ReadEvalString(EvalString* eval, bool path, string* err) {
 		128, 128,   0, 128, 128, 128, 128, 128, 
 		128, 128, 128, 128, 128, 128, 128, 128, 
 		128, 128, 128, 128, 128, 128, 128, 128, 
-		 32, 128, 128, 128,   0, 128, 128, 128, 
-		128, 128, 128, 128, 128, 128, 192, 128, 
-		208, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208,   0, 128, 128, 128, 128, 128, 
-		128, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208, 208, 128, 128, 128, 128, 208, 
-		128, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208, 208, 208, 208, 208, 208, 208, 
-		208, 208, 208, 128,   0, 128, 128, 128, 
+		 16, 128, 128, 128,   0, 128, 128, 128, 
+		128, 128, 128, 128, 128, 128, 160, 128, 
+		224, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224,   0, 128, 128, 128, 128, 128, 
+		128, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224, 224, 128, 128, 128, 128, 224, 
+		128, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224, 224, 224, 224, 224, 224, 224, 
+		224, 224, 224, 128,   0, 128, 128, 128, 
 		128, 128, 128, 128, 128, 128, 128, 128, 
 		128, 128, 128, 128, 128, 128, 128, 128, 
 		128, 128, 128, 128, 128, 128, 128, 128, 
@@ -581,7 +581,7 @@ bool Lexer::ReadEvalString(EvalString* eval, bool path, string* err) {
 	}
 	++p;
 	yych = *p;
-	goto yy111;
+	goto yy114;
 yy87:
 	{
       eval->Add(EvalString::RAW, StringPiece(start, p - start));
@@ -601,21 +601,30 @@ yy88:
       }
     }
 yy90:
-	yych = *(q = ++p);
-	if (yybm[0+yych] & 16) {
-		goto yy94;
-	}
-	if (yych <= ' ') {
-		if (yych == '\n') goto yy99;
-		if (yych >= ' ') goto yy102;
-	} else {
-		if (yych <= '$') {
-			if (yych >= '$') goto yy104;
+	++p;
+	if ((yych = *p) <= '9') {
+		if (yych <= ' ') {
+			if (yych == '\n') goto yy103;
+			if (yych <= 0x1F) goto yy94;
+			goto yy96;
 		} else {
-			if (yych == '{') goto yy97;
+			if (yych == '$') goto yy98;
+			if (yych <= '/') goto yy94;
+			goto yy100;
+		}
+	} else {
+		if (yych <= '_') {
+			if (yych <= '@') goto yy94;
+			if (yych <= 'Z') goto yy100;
+			if (yych <= '^') goto yy94;
+			goto yy100;
+		} else {
+			if (yych <= '`') goto yy94;
+			if (yych <= 'z') goto yy100;
+			if (yych <= '{') goto yy102;
+			goto yy94;
 		}
 	}
-yy91:
 	{
       last_token_ = start;
       return Error("lexing error", err);
@@ -628,60 +637,76 @@ yy92:
     }
 yy94:
 	++p;
-	yych = *p;
-	if (yybm[0+yych] & 16) {
-		goto yy94;
-	}
+yy95:
 	{
-      eval->Add(EvalString::SPECIAL, StringPiece(start + 1, p - start - 1));
-      continue;
+      last_token_ = start;
+      return Error("bad $-escape (literal $ must be written as $$)", err);
     }
-yy97:
-	yych = *++p;
-	if (yych != '}') goto yy107;
-yy98:
-	p = q;
-	goto yy91;
-yy99:
-	++p;
-	yych = *p;
-	if (yybm[0+yych] & 32) {
-		goto yy99;
-	}
-	{
-      continue;
-    }
-yy102:
+yy96:
 	++p;
 	{
       eval->Add(EvalString::RAW, StringPiece(" ", 1));
       continue;
     }
-yy104:
+yy98:
 	++p;
 	{
       eval->Add(EvalString::RAW, StringPiece("$", 1));
       continue;
     }
+yy100:
+	++p;
+	yych = *p;
+	goto yy112;
+yy101:
+	{
+      eval->Add(EvalString::SPECIAL, StringPiece(start + 1, p - start - 1));
+      continue;
+    }
+yy102:
+	yych = *(q = ++p);
+	if (yybm[0+yych] & 32) {
+		goto yy106;
+	}
+	goto yy95;
+yy103:
+	++p;
+	yych = *p;
+	if (yybm[0+yych] & 16) {
+		goto yy103;
+	}
+	{
+      continue;
+    }
 yy106:
 	++p;
 	yych = *p;
-yy107:
-	if (yybm[0+yych] & 64) {
+	if (yybm[0+yych] & 32) {
 		goto yy106;
 	}
-	if (yych != '}') goto yy98;
+	if (yych == '}') goto yy109;
+	p = q;
+	goto yy95;
+yy109:
 	++p;
 	{
       eval->Add(EvalString::SPECIAL, StringPiece(start + 2, p - start - 3));
       continue;
     }
-yy110:
+yy111:
 	++p;
 	yych = *p;
-yy111:
+yy112:
+	if (yybm[0+yych] & 64) {
+		goto yy111;
+	}
+	goto yy101;
+yy113:
+	++p;
+	yych = *p;
+yy114:
 	if (yybm[0+yych] & 128) {
-		goto yy110;
+		goto yy113;
 	}
 	goto yy87;
 }

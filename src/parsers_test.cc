@@ -254,7 +254,7 @@ TEST_F(ParserTest, Errors) {
     ManifestParser parser(&state, NULL);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = $", &err));
-    EXPECT_EQ("input:1: lexing error\n"
+    EXPECT_EQ("input:1: bad $-escape (literal $ must be written as $$)\n"
               "x = $\n"
               "    ^\n"
               , err);
@@ -265,7 +265,7 @@ TEST_F(ParserTest, Errors) {
     ManifestParser parser(&state, NULL);
     string err;
     EXPECT_FALSE(parser.ParseTest("x = $\n $[\n", &err));
-    EXPECT_EQ("input:2: lexing error\n"
+    EXPECT_EQ("input:2: bad $-escape (literal $ must be written as $$)\n"
               " $[\n"
               " ^\n"
               , err);
@@ -332,7 +332,7 @@ TEST_F(ParserTest, Errors) {
                                   "  command = ${fafsd\n"
                                   "foo = bar\n",
                                   &err));
-    EXPECT_EQ("input:2: lexing error\n"
+    EXPECT_EQ("input:2: bad $-escape (literal $ must be written as $$)\n"
               "  command = ${fafsd\n"
               "            ^\n"
               , err);
@@ -346,7 +346,7 @@ TEST_F(ParserTest, Errors) {
     EXPECT_FALSE(parser.ParseTest("rule cat\n"
                                   "  command = cat\nbuild $: cat foo\n",
                                   &err));
-    EXPECT_EQ("input:3: lexing error\n"
+    EXPECT_EQ("input:3: bad $-escape (literal $ must be written as $$)\n"
               "build $: cat foo\n"
               "      ^\n"
               , err);
@@ -382,7 +382,7 @@ TEST_F(ParserTest, Errors) {
     EXPECT_FALSE(parser.ParseTest("rule cc\n  command = foo\n"
                                   "build $: cc bar.cc\n",
                                   &err));
-    EXPECT_EQ("input:3: lexing error\n"
+    EXPECT_EQ("input:3: bad $-escape (literal $ must be written as $$)\n"
               "build $: cc bar.cc\n"
               "      ^\n"
               , err);
