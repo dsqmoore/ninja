@@ -45,16 +45,22 @@ bool Lexer::Error(const string& message, string* err) {
   *err += message + "\n";
 
   // Add some context to the message.
-  if (col > 0) {
+  const int kTruncateColumn = 72;
+  if (col > 0 && col < kTruncateColumn) {
     int len;
-    for (len = 0; len < 50; ++len) {
-      if (context[len] == 0 || context[len] == '\n')
+    bool truncated = true;
+    for (len = 0; len < kTruncateColumn; ++len) {
+      if (context[len] == 0 || context[len] == '\n') {
+        truncated = false;
         break;
+      }
     }
     *err += string(context, len);
+    if (truncated)
+      *err += "...";
     *err += "\n";
     *err += string(col, ' ');
-    *err += "^\n";
+    *err += "^ near here\n";
   }
 
   return false;
