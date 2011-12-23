@@ -22,11 +22,6 @@
 
 #define YYMAXFILL 9
 
-void Fatal(const char* msg) {
-  printf("FATAL: %s\n", msg);
-  assert(0);
-}
-
 bool Lexer::Error(const string& message, string* err) {
   // Compute line/column.
   int line = 1;
@@ -81,20 +76,20 @@ const char* Lexer::TokenName(Token t) {
   switch (t) {
   case ERROR:    return "lexing error";
   case BUILD:    return "'build'";
-  case RULE:     return "'rule'";
-  case DEFAULT:  return "'default'";
-  case IDENT:    return "identifier";
-  case EQUALS:   return "'='";
-  case TEOF:     return "eof";
-  case INDENT:   return "indent";
   case COLON:    return "':'";
-  case PIPE:     return "'|'";
-  case PIPE2:    return "'||'";
-  case NEWLINE:  return "newline";
+  case DEFAULT:  return "'default'";
+  case EQUALS:   return "'='";
+  case IDENT:    return "identifier";
   case INCLUDE:  return "'include'";
+  case INDENT:   return "indent";
+  case NEWLINE:  return "newline";
+  case PIPE2:    return "'||'";
+  case PIPE:     return "'|'";
+  case RULE:     return "'rule'";
   case SUBNINJA: return "'subninja'";
+  case TEOF:     return "eof";
   }
-  return NULL;
+  return NULL;  // not reached
 }
 
 void Lexer::UnreadToken() {

@@ -18,33 +18,40 @@ struct EvalString;
 
 struct Lexer {
   Lexer() {}
+  /// Helper ctor useful for tests.
   explicit Lexer(const char* input);
-  void Start(StringPiece filename, StringPiece input);
 
   enum Token {
     ERROR,
     BUILD,
-    RULE,
-    DEFAULT,
-    INCLUDE,
-    SUBNINJA,
-    IDENT,
-    EQUALS,
-    TEOF,
-    INDENT,
     COLON,
+    DEFAULT,
+    EQUALS,
+    IDENT,
+    INCLUDE,
+    INDENT,
+    NEWLINE,
     PIPE,
     PIPE2,
-    NEWLINE,
+    RULE,
+    SUBNINJA,
+    TEOF,
   };
 
+  /// Return a human-readable form of a token, used in error messages.
   static const char* TokenName(Token t);
 
+  /// Start parsing some input.
+  void Start(StringPiece filename, StringPiece input);
+
+  /// Read a Token from the Token enum.
   Token ReadToken();
+
+  /// Rewind to the last read Token.
   void UnreadToken();
+
+  /// If the next token is \a token, read it and return true.
   bool PeekToken(Token token);
-  bool ExpectToken(Token token);
-  void EatWhitespace();
 
   /// Read a simple identifier (a rule or variable name).
   /// Returns false if a name can't be read.
@@ -56,21 +63,26 @@ struct Lexer {
   bool ReadPath(EvalString* path, string* err) {
     return ReadEvalString(path, true, err);
   }
+
   /// Read the value side of a var = value line (complete with $escapes).
   /// Returns false only on error.
   bool ReadVarValue(EvalString* value, string* err) {
     return ReadEvalString(value, false, err);
   }
 
+  /// Construct an error message with context.
   bool Error(const string& message, string* err);
 
 private:
+  /// Skip past whitespace (called after each read token/ident/etc.).
+  void EatWhitespace();
+
+  /// Read a $-escaped string.
   bool ReadEvalString(EvalString* eval, bool path, string* err);
 
   StringPiece filename_;
   StringPiece input_;
   const char* ofs_;
-
   const char* last_token_;
 };
 
